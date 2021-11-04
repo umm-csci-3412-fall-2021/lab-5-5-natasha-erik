@@ -1,12 +1,17 @@
 package xrate;
 
 import java.io.IOException;
+import org.json.JSONObject;
+import org.json.JSONTokener;
+import java.io.InputStream;
+import java.net.URL;
 
 /**
  * Provide access to basic currency exchange rate services.
  */
 public class ExchangeRateReader {
 
+    private String baseLink;
     private String accessKey;
 
     /**
@@ -27,8 +32,7 @@ public class ExchangeRateReader {
          * accessible in the two key functions. (You'll need it there to construct
          * the full URL.)
          */
-
-        // TODO Your code here
+        baseLink = baseURL;
 
         // Reads the Fixer.io API access key from the appropriate
         // environment variable.
@@ -84,10 +88,16 @@ public class ExchangeRateReader {
          *       currency code from the "rates" object. 
          */
 
-        // TODO Your code here
+        //Create the URL and open the input stream
+         String finalURL = baseLink + year + "-" + padZeros(month) + "-" + padZeros(day) + "?access_key=" + accessKey + "&symbols=" + currencyCode;
+         URL url = new URL(finalURL);
+         InputStream inputStream = url.openStream();
 
-        // Remove the next line when you've implemented this method.
-        throw new UnsupportedOperationException();
+         //Create the JSON tokener and JSON object to get the desired currency code
+         JSONTokener tokener = new JSONTokener(inputStream);
+         JSONObject currencyJSON = new JSONObject(tokener);
+
+         return getRate(currencyJSON, currencyCode);
     }
 
     /**
@@ -114,9 +124,32 @@ public class ExchangeRateReader {
          * the previous method.
          */
         
-        // TODO Your code here
+        //Create the URL and open the input stream
+         String finalURL = baseLink + year + "-" + padZeros(month) + "-" + padZeros(day) + "?access_key=" + accessKey + "&symbols=" + fromCurrency + "," + toCurrency;
+         URL url = new URL(finalURL);
+         InputStream inputStream = url.openStream();
 
-        // Remove the next line when you've implemented this method.
-        throw new UnsupportedOperationException();
+        //Create the JSON tokener and JSON object to get the desired currency code
+         JSONTokener tokener = new JSONTokener(inputStream);
+         JSONObject currencyJSON = new JSONObject(tokener);
+
+         float fromRate = getRate(currencyJSON, fromCurrency);
+         float toRate = getRate(currencyJSON, toCurrency);
+         return fromRate/toRate;
     }
+
+    private float getRate(JSONObject JSONdata, String currencyCode){
+        JSONObject rates = JSONdata.getJSONObject("rates");
+        return rates.getFloat(currencyCode);
+    }
+
+    //Add zeros to the beginning of the month or day when it is
+    //a single digit 
+    private String padZeros(int date){
+        if(date < 10){
+            return "0" + date;
+        }
+        return Integer.toString(date);
+    }
+    
 }
