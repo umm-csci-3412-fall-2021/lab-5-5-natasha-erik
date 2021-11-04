@@ -8,7 +8,7 @@ import java.util.Scanner;
 
 public class Main {
     private static final String NICS_DUMMY_DATA_URL = "http://facultypages.morris.umn.edu/~mcphee/ExchangeRateData/";
-
+    private static final String FIXER_BASE_URL = "http://data.fixer.io/api/";
     /**
      * Prompts the user for a currency code, and prints out the exchange rate for
      * that currency code for the (fixed) date 25 June 2010 as read from the cached
